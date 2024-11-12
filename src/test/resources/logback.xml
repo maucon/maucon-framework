@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Define ANSI color codes -->
+    <property name="RED" value="31"/>
+    <property name="YELLOW" value="33"/>
+    <property name="BLUE" value="34"/>
+    <property name="WHITE" value="37"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %highlight(%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{48} - %msg%n){ ${RED}, ${YELLOW}, ${WHITE}, ${WHITE}, ${BLUE}, ${WHITE} }
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set the root log level -->
+    <root level="TRACE">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>
