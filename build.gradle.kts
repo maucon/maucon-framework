@@ -25,6 +25,12 @@ kotlin {
     jvmToolchain(21)
 }
 
+tasks.register("printVersion") {
+    doLast {
+        println(version)
+    }
+}
+
 tasks.register<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
@@ -55,7 +61,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/maucon/maucon-framework")
 
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
+                username = "maucon"
                 password = System.getenv("GITHUB_TOKEN")
             }
         }

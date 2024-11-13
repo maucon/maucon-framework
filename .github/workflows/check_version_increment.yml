@@ -23,8 +23,8 @@ jobs:
 
       - name: Compare versions
         run: |
-          BASE_VERSION=$(grep '^version' base/build.gradle.kts | awk '{print $3}' | tr -d \")
-          PR_VERSION=$(grep '^version' pr/build.gradle.kts | awk '{print $3}' | tr -d \")
+          BASE_VERSION=$(cd base && ./gradlew printVersion -q)
+          PR_VERSION=$(cd pr && ./gradlew printVersion -q)
           
           echo "Base version: $BASE_VERSION"
           echo "PR version: $PR_VERSION"

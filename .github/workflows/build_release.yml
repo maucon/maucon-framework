@@ -37,4 +37,31 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: build/test-results/test/TEST-*.xml
+          path: build/test-results/test/
+
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }
+        run: ./gradlew publish
+
+      - name: Create a Release on GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}  # GitHub token for authentication
+        run: |
+          VERSION=$(./gradlew printVersion -q)
+          TAG_NAME="v${VERSION}"
+          RELEASE_NAME="${TAG_NAME}"
+          BODY="Automated release of version ${VERSION}."
+          
+          # Create a new GitHub release via GitHub API
+          curl -X POST https://api.github.com/repos/${{ github.repository }}/releases \
+            -H "Authorization: token ${{ secrets.RELEASE_TOKEN }}" \
+            -d @- << EOF
+          {
+            "tag_name": "$TAG_NAME",
+            "name": "$RELEASE_NAME",
+            "body": "$BODY",
+            "draft": false,
+            "prerelease": false
+          }
+          EOF
