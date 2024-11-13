@@ -42,5 +42,10 @@ jobs:
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
+        permissions:
+          contents: read
+          issues: read
+          checks: write
+          pull-requests: write
         with:
           files: build/test-results/test/*.xml
