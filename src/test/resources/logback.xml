@@ -16,7 +16,7 @@
     </appender>
 
     <!-- Set the root log level -->
-    <root level="TRACE">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 

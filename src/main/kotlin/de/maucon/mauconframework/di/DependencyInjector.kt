@@ -23,7 +23,10 @@ internal object DependencyInjector {
         val configurationClasses = scanForClassesWithAnnotation(reflection, Configuration::class.java)
 
         val componentsDescriptors = mapToComponentDescriptors(injectableClasses, configurationClasses)
-        log.debug(componentsDescriptors.toString())
+
+        log.debug("Found ${injectableClasses.size} injectable classes")
+        log.debug("Found ${configurationClasses.size} configuration classes")
+        log.debug("Resolving ${componentsDescriptors.size} components")
 
         return instantiateComponents(componentsDescriptors)
     }
@@ -50,7 +53,7 @@ internal object DependencyInjector {
     private fun mapClassToComponentDescriptor(clazz: Class<*>): ComponentDescriptor {
         val qualifierName = clazz.getAnnotation(Injectable::class.java)?.name?.ifEmpty { clazz.simpleName }?.lowercase()
             ?: clazz.simpleName.lowercase()
-        val classConstructor = clazz.constructors.first() // TODO what when multiple constructors are found?
+        val classConstructor = clazz.constructors.first() // what when multiple constructors are found?
 
         val constructor = { args: Array<*> -> classConstructor.newInstance(*args) }
         val qualifier = ComponentQualifier(clazz, qualifierName)
@@ -104,15 +107,18 @@ internal object DependencyInjector {
             if (qualifier in instances) {
                 return instances[qualifier]!!
             }
+
+            log.debug("Instantiating component: ${descriptor.qualifier.type.simpleName}")
+
             if (qualifier in resolving) {
-                throw CyclicDependencyException("Cyclic dependency detected for component: ${qualifier.type.simpleName}")
+                throw CyclicDependencyException("Cyclic dependency detected for component: $qualifier")
             }
 
             resolving.add(qualifier)
 
             val resolvedDependencies = descriptor.dependencies.map { dependencyQualifier ->
                 val dependencyDescriptor = componentDescriptors.find { it.qualifier == dependencyQualifier }
-                    ?: throw UnresolvedDependencyException("Unresolved dependency: ${dependencyQualifier.type.simpleName} required by ${qualifier.type.simpleName}")
+                    ?: throw UnresolvedDependencyException("Unresolved dependency: $dependencyQualifier required by $qualifier")
 
                 resolveComponent(dependencyDescriptor)
             }.toTypedArray()
@@ -120,7 +126,7 @@ internal object DependencyInjector {
             val instance = try {
                 descriptor.constructor(resolvedDependencies)
             } catch (e: Exception) {
-                throw ComponentInstantiationException("Failed to instantiate component: ${qualifier.type}", e)
+                throw ComponentInstantiationException("Failed to instantiate component: $qualifier", e)
             }
 
             instances[qualifier] = instance
@@ -133,7 +139,7 @@ internal object DependencyInjector {
             try {
                 resolveComponent(descriptor)
             } catch (e: Exception) {
-                throw ResolveComponentException("Error instantiating component: ${descriptor.qualifier.type.simpleName}. Cause: ${e.message}", e)
+                throw ResolveComponentException("Error resolving component: ${descriptor.qualifier}. Cause: ${e.message}", e)
             }
         }
 

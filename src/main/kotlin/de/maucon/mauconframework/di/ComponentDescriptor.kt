@@ -9,4 +9,6 @@ internal data class ComponentDescriptor(
 internal data class ComponentQualifier(
     val type: Class<*>,
     val qualifier: String
-)
+) {
+    override fun toString() = "${type.simpleName} ($type)"
+}

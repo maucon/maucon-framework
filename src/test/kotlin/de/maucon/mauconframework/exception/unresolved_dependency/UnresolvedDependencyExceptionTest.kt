@@ -14,6 +14,7 @@ class UnresolvedDependencyExceptionTest {
     @Test
     fun test002() {
         val exception = assertThrows<ResolveComponentException> { MauConFramework.start(Test002::class.java) }
+        exception.printStackTrace()
         assertEquals(UnresolvedDependencyException::class, exception.cause!!::class)
     }
 }
