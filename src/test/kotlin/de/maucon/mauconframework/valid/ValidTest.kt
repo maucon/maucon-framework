@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.assertContains
-import kotlin.test.assertTrue
 
 @DisplayName("Valid framework configurations")
 class ValidTest {
@@ -19,8 +18,6 @@ class ValidTest {
 
         assertContains<Class<*>>(componentClasses, Test001.ServiceA::class.java)
         assertContains<Class<*>>(componentClasses, Test001.ServiceB::class.java)
-
-        assertTrue(false)
     }
 
     @Test
