@@ -21,6 +21,9 @@ jobs:
           ref: ${{ github.head_ref }}
           path: pr
 
+      - name: Grant gradle permissions
+        run: chmod +x ./gradlew
+
       - name: Compare versions
         run: |
           BASE_VERSION=$(cd base && ./gradlew printVersion -q)
