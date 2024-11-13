@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "de.maucon"
-version = "0.0.6"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
