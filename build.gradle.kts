@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "de.maucon"
-version = "0.0.2"
+version = "0.0.3"
 
 repositories {
     mavenCentral()
@@ -23,6 +23,12 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
+}
+
+tasks.register("printVersion") {
+    doLast {
+        println(version)
+    }
 }
 
 tasks.register<Jar>("sourcesJar") {
@@ -55,7 +61,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/maucon/maucon-framework")
 
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
+                username = "maucon"
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
