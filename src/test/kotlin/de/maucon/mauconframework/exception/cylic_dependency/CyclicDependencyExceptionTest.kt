@@ -14,6 +14,7 @@ class CyclicDependencyExceptionTest {
     @Test
     fun test002() {
         val exception = assertThrows<ResolveComponentException> { MauConFramework.start(Test002::class.java) }
+        exception.printStackTrace()
         assertEquals(CyclicDependencyException::class, exception.cause!!::class)
     }
 }
