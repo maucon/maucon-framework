@@ -41,19 +41,16 @@ jobs:
 
       - name: Publish to GitHub Packages
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: ./gradlew publish
 
       - name: Create a Release on GitHub
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}  # GitHub token for authentication
         run: |
           VERSION=$(./gradlew printVersion -q)
           TAG_NAME="v${VERSION}"
           RELEASE_NAME="${TAG_NAME}"
           BODY="Automated release of version ${VERSION}."
           
-          # Create a new GitHub release via GitHub API
           curl -X POST https://api.github.com/repos/${{ github.repository }}/releases \
             -H "Authorization: token ${{ secrets.RELEASE_TOKEN }}" \
             -d @- << EOF
