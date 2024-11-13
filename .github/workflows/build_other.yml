@@ -8,6 +8,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,10 +49,5 @@ jobs:
       - name: Publish test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
-        permissions:
-          contents: read
-          issues: read
-          checks: write
-          pull-requests: write
         with:
           files: build/test-results/test/*.xml
