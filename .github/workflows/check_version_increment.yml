@@ -21,13 +21,10 @@ jobs:
           ref: ${{ github.head_ref }}
           path: pr
 
-      - name: Grant gradle permissions
-        run: chmod +x ./gradlew
-
       - name: Compare versions
         run: |
-          BASE_VERSION=$(cd base && ./gradlew printVersion -q)
-          PR_VERSION=$(cd pr && ./gradlew printVersion -q)
+          BASE_VERSION=$(cd base && chmod +x ./gradlew && ./gradlew printVersion -q)
+          PR_VERSION=$(cd pr && chmod +x ./gradlew && ./gradlew printVersion -q)
           
           echo "Base version: $BASE_VERSION"
           echo "PR version: $PR_VERSION"
