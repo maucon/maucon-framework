@@ -6,8 +6,6 @@ package de.maucon.mauconframework.annotation
  * This annotation can be applied to classes or methods that are intended to be injectable.
  * When applied to a method, the method must be within a class annotated with [Configuration].
  *
-
- *
  * Example usage:
  * ```
  * @Injectable("customName")
