@@ -10,8 +10,6 @@ package de.maucon.mauconframework.annotation
  * is annotated with `@Injectable(name = "customName")`, dependent parameters can use `@Qualifier("customName")`
  * to request that specific component.
  *
-
- *
  * Example usage:
  * ```
  * @Injectable("customName")

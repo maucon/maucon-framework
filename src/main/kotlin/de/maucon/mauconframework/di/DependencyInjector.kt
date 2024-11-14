@@ -102,47 +102,64 @@ internal object DependencyInjector {
         val instances = mutableMapOf<ComponentQualifier, Any>()
         val resolving = mutableSetOf<ComponentQualifier>()
 
-        fun resolveComponent(descriptor: ComponentDescriptor): Any {
-            val qualifier = descriptor.qualifier
-            if (qualifier in instances) {
-                return instances[qualifier]!!
-            }
-
-            log.debug("Instantiating component: ${descriptor.qualifier.type.simpleName}")
-
-            if (qualifier in resolving) {
-                throw CyclicDependencyException("Cyclic dependency detected for component: $qualifier")
-            }
-
-            resolving.add(qualifier)
-
-            val resolvedDependencies = descriptor.dependencies.map { dependencyQualifier ->
-                val dependencyDescriptor = componentDescriptors.find { it.qualifier == dependencyQualifier }
-                    ?: throw UnresolvedDependencyException("Unresolved dependency: $dependencyQualifier required by $qualifier")
-
-                resolveComponent(dependencyDescriptor)
-            }.toTypedArray()
-
-            val instance = try {
-                descriptor.constructor(resolvedDependencies)
-            } catch (e: Exception) {
-                throw ComponentInstantiationException("Failed to instantiate component: $qualifier", e)
-            }
-
-            instances[qualifier] = instance
-            resolving.remove(qualifier)
-
-            return instance
-        }
-
         for (descriptor in componentDescriptors) {
             try {
-                resolveComponent(descriptor)
+                resolveComponent(componentDescriptors, instances, resolving, descriptor)
             } catch (e: Exception) {
                 throw ResolveComponentException("Error resolving component: ${descriptor.qualifier}. Cause: ${e.message}", e)
             }
         }
 
         return instances.values
+    }
+
+    private fun resolveComponent(
+        componentDescriptors: List<ComponentDescriptor>,
+        instances: MutableMap<ComponentQualifier, Any>,
+        resolving: MutableSet<ComponentQualifier>,
+        descriptor: ComponentDescriptor
+    ): Any {
+        val qualifier = descriptor.qualifier
+        if (qualifier in instances) {
+            return instances[qualifier]!!
+        }
+
+        log.debug("Instantiating component: ${descriptor.qualifier.type.simpleName}")
+
+        if (qualifier in resolving) {
+            throw CyclicDependencyException("Cyclic dependency detected for component: $qualifier")
+        }
+
+        resolving.add(qualifier)
+
+        val resolvedDependencies = descriptor.dependencies.map {
+            val dependencyDescriptor = findMatchingComponentDescriptor(componentDescriptors, it, qualifier)
+            resolveComponent(componentDescriptors, instances, resolving, dependencyDescriptor)
+        }.toTypedArray()
+
+        val instance = try {
+            descriptor.constructor(resolvedDependencies)
+        } catch (e: Exception) {
+            throw ComponentInstantiationException("Failed to instantiate component: $qualifier", e)
+        }
+
+        instances[qualifier] = instance
+        resolving.remove(qualifier)
+
+        return instance
+    }
+
+    private fun findMatchingComponentDescriptor(
+        componentDescriptors: List<ComponentDescriptor>,
+        dependencyQualifier: ComponentQualifier,
+        resolvingQualifier: ComponentQualifier
+    ): ComponentDescriptor {
+        componentDescriptors.find { it.qualifier == dependencyQualifier }
+            ?.also { return it }
+
+        componentDescriptors.find { it.qualifier.type == dependencyQualifier.type }
+            ?.also { return it }
+
+        throw UnresolvedDependencyException("Unresolved dependency: $dependencyQualifier required by $resolvingQualifier")
     }
 }
