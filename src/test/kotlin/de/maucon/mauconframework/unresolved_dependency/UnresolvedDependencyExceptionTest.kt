@@ -1,20 +1,20 @@
-package de.maucon.mauconframework.exception.cylic_dependency
+package de.maucon.mauconframework.unresolved_dependency
 
 import de.maucon.mauconframework.MauConFramework
-import de.maucon.mauconframework.di.exception.CyclicDependencyException
 import de.maucon.mauconframework.di.exception.ResolveComponentException
-import de.maucon.mauconframework.exception.cylic_dependency.test002.Test002
+import de.maucon.mauconframework.di.exception.UnresolvedDependencyException
+import de.maucon.mauconframework.unresolved_dependency.test002.Test002
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
-@DisplayName("Cyclic dependency exceptions")
-class CyclicDependencyExceptionTest {
+@DisplayName("Unresolved dependency exceptions")
+class UnresolvedDependencyExceptionTest {
     @Test
     fun test002() {
         val exception = assertThrows<ResolveComponentException> { MauConFramework.start(Test002::class.java) }
         exception.printStackTrace()
-        assertEquals(CyclicDependencyException::class, exception.cause!!::class)
+        assertEquals(UnresolvedDependencyException::class, exception.cause!!::class)
     }
 }

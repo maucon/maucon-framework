@@ -1,4 +1,4 @@
-package de.maucon.mauconframework.exception.unresolved_dependency.test002
+package de.maucon.mauconframework.unresolved_dependency.test002
 
 import de.maucon.mauconframework.annotation.Injectable
 

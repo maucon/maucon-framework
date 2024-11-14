@@ -1,4 +1,4 @@
-package de.maucon.mauconframework.exception.component_instantiation.test002
+package de.maucon.mauconframework.component_instantiation.test002
 
 import de.maucon.mauconframework.annotation.Injectable
 
