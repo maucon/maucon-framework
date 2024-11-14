@@ -1,4 +1,4 @@
-package de.maucon.mauconframework.initialize.test002
+package de.maucon.mauconframework.initialize.method_invocation.test002
 
 import de.maucon.mauconframework.annotation.Configuration
 import de.maucon.mauconframework.annotation.Initialize
