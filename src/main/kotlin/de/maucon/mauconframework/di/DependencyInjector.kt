@@ -1,16 +1,20 @@
 package de.maucon.mauconframework.di
 
 import de.maucon.mauconframework.annotation.Configuration
-import de.maucon.mauconframework.annotation.Initialize
 import de.maucon.mauconframework.annotation.Injectable
-import de.maucon.mauconframework.annotation.Qualifier
-import de.maucon.mauconframework.di.exception.*
+import de.maucon.mauconframework.di.ComponentDefinitionCreator.mapConfigurationClassesToComponentDefinition
+import de.maucon.mauconframework.di.ComponentDefinitionCreator.mapInjectableClassesToComponentDefinition
+import de.maucon.mauconframework.di.DependencyMatcher.getComponentDefinitionByDependencyQualifier
+import de.maucon.mauconframework.di.InitializeRunner.gatherInitializeCallData
+import de.maucon.mauconframework.di.InitializeRunner.runInitializeCalls
+import de.maucon.mauconframework.di.data.ComponentDefinition
+import de.maucon.mauconframework.di.exception.ComponentInstantiationException
+import de.maucon.mauconframework.di.exception.CyclicDependencyException
+import de.maucon.mauconframework.di.exception.ResolveComponentException
+import de.maucon.mauconframework.di.exception.UnresolvedDependencyException
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
 import org.slf4j.LoggerFactory
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
-import java.lang.reflect.Parameter
 
 private val log = LoggerFactory.getLogger(DependencyInjector::class.java)
 
@@ -23,14 +27,16 @@ internal object DependencyInjector {
         log.debug("Found ${injectableClasses.size} injectable classes")
         log.debug("Found ${configurationClasses.size} configuration classes")
 
-        val componentsDescriptors = mapClassToComponentDescriptors(injectableClasses, configurationClasses)
-        val components = instantiateComponents(componentsDescriptors)
+        val injectableComponentDefinitions = mapInjectableClassesToComponentDefinition(injectableClasses)
+        val configurationComponentDefinitions = mapConfigurationClassesToComponentDefinition(configurationClasses)
+        val componentDefinitions = injectableComponentDefinitions + configurationComponentDefinitions
+        val components = instantiateComponents(componentDefinitions)
         log.debug("Resolved ${components.size} components")
 
-        val initializeCalls = gatherInitializeCalls(components)
-        log.debug("Running ${initializeCalls.size} initialize calls")
+        val initializeCallData = gatherInitializeCallData(components)
+        log.debug("Running ${initializeCallData.size} initialize calls")
 
-        runInitializeCalls(initializeCalls)
+        runInitializeCalls(initializeCallData)
 
         return components.values
     }
@@ -46,72 +52,15 @@ internal object DependencyInjector {
             .toSet()
     }
 
-    private fun mapClassToComponentDescriptors(
-        injectableClasses: Set<Class<*>>,
-        configurationClasses: Set<Class<*>>
-    ): List<ComponentDescriptor> =
-        injectableClasses.map { mapClassToComponentDescriptor(it) } +
-                configurationClasses.flatMap { mapMethodsToComponentDescriptor(it) }
+    private fun instantiateComponents(componentDefinitions: List<ComponentDefinition>): Map<ComponentDefinition, Any> {
+        val instances = mutableMapOf<ComponentDefinition, Any>()
+        val resolving = mutableSetOf<ComponentDefinition>()
 
-    private fun mapClassToComponentDescriptor(clazz: Class<*>): ComponentDescriptor {
-        val qualifierName = clazz.getAnnotation(Injectable::class.java)?.name?.ifEmpty { clazz.simpleName }?.lowercase()
-            ?: clazz.simpleName.lowercase()
-        val classConstructor = clazz.constructors.first() // what when multiple constructors are found?
-
-        val constructor = { args: Array<*> -> classConstructor.newInstance(*args) }
-        val qualifier = ComponentQualifier(clazz, qualifierName)
-        val dependencies = mapMethodParametersToComponentQualifier(classConstructor.parameters.asList())
-
-        return ComponentDescriptor(qualifier, dependencies, constructor)
-    }
-
-    private fun mapMethodsToComponentDescriptor(clazz: Class<*>): List<ComponentDescriptor> {
-        val classComponentDescriptor = mapClassToComponentDescriptor(clazz)
-        val componentDescriptors = listOf(classComponentDescriptor)
-
-        val methodComponentDescriptors = clazz.declaredMethods
-            .filter { it.isAnnotationPresent(Injectable::class.java) }
-            .map { mapMethodToComponentDescriptor(it, classComponentDescriptor) }
-
-        return componentDescriptors + methodComponentDescriptors
-    }
-
-    private fun mapMethodToComponentDescriptor(
-        method: Method,
-        classComponentDescriptor: ComponentDescriptor
-    ): ComponentDescriptor {
-        val injectable = method.getAnnotation(Injectable::class.java)
-        val qualifierName = injectable.name.ifEmpty { method.name }.lowercase()
-
-        val qualifier = ComponentQualifier(method.returnType, qualifierName)
-        val dependencies = listOf(classComponentDescriptor.qualifier) + mapMethodParametersToComponentQualifier(method.parameters.asList())
-        val constructor = { args: Array<*> ->
-            val (classObject, realArgs) = args[0] to args.drop(1).toTypedArray()
-            method.invoke(classObject, *realArgs)
-        }
-
-        return ComponentDescriptor(qualifier, dependencies, constructor)
-    }
-
-    private fun mapMethodParametersToComponentQualifier(parameters: List<Parameter>) =
-        parameters.map { mapParameterToComponentQualifier(it) }
-
-    private fun mapParameterToComponentQualifier(parameter: Parameter): ComponentQualifier {
-        val qualifierName = parameter.getAnnotation(Qualifier::class.java)?.name?.lowercase()
-            ?: parameter.type.simpleName.lowercase()
-
-        return ComponentQualifier(parameter.type, qualifierName)
-    }
-
-    private fun instantiateComponents(componentDescriptors: List<ComponentDescriptor>): MutableMap<ComponentQualifier, Any> {
-        val instances = mutableMapOf<ComponentQualifier, Any>()
-        val resolving = mutableSetOf<ComponentQualifier>()
-
-        for (descriptor in componentDescriptors) {
+        for (definition in componentDefinitions) {
             try {
-                resolveComponent(componentDescriptors, instances, resolving, descriptor)
+                resolveComponent(componentDefinitions, instances, resolving, definition)
             } catch (e: Exception) {
-                throw ResolveComponentException("Error resolving component: ${descriptor.qualifier}. Cause: ${e.message}", e)
+                throw ResolveComponentException("Error resolving component: ${definition}. Cause: ${e.message}", e)
             }
         }
 
@@ -119,100 +68,39 @@ internal object DependencyInjector {
     }
 
     private fun resolveComponent(
-        componentDescriptors: List<ComponentDescriptor>,
-        instances: MutableMap<ComponentQualifier, Any>,
-        resolving: MutableSet<ComponentQualifier>,
-        descriptor: ComponentDescriptor
+        componentDefinitions: List<ComponentDefinition>,
+        instances: MutableMap<ComponentDefinition, Any>,
+        resolving: MutableSet<ComponentDefinition>,
+        resolvingDefinition: ComponentDefinition
     ): Any {
-        val qualifier = descriptor.qualifier
-        if (qualifier in instances) {
-            return instances[qualifier]!!
+        if (resolvingDefinition in instances) {
+            return instances[resolvingDefinition]!!
         }
 
-        log.debug("Instantiating component: ${descriptor.qualifier.type.simpleName}")
+        log.debug("Instantiating component: {} -> {}", resolvingDefinition, resolvingDefinition.dependencies)
 
-        if (qualifier in resolving) {
-            throw CyclicDependencyException("Cyclic dependency detected for component: $qualifier")
+        if (resolvingDefinition in resolving) {
+            throw CyclicDependencyException("Cyclic dependency detected for component: $resolvingDefinition")
         }
 
-        resolving.add(qualifier)
+        resolving.add(resolvingDefinition)
 
-        val resolvedDependencies = descriptor.dependencies.map {
-            val dependencyDescriptor = findMatchingComponentDescriptor(componentDescriptors, it)
-                ?: throw UnresolvedDependencyException("Unresolved dependency: $it required by $qualifier")
+        val resolvedDependencies = resolvingDefinition.dependencies.map {
+            val dependencyComponentDefinition = getComponentDefinitionByDependencyQualifier(resolvingDefinition, componentDefinitions, it)
+                ?: throw UnresolvedDependencyException("Unresolved dependency: $it required by $resolvingDefinition")
 
-            resolveComponent(componentDescriptors, instances, resolving, dependencyDescriptor)
+            resolveComponent(componentDefinitions, instances, resolving, dependencyComponentDefinition)
         }.toTypedArray()
 
         val instance = try {
-            descriptor.constructor(resolvedDependencies)
+            resolvingDefinition.constructor(resolvedDependencies)
         } catch (e: Exception) {
-            throw ComponentInstantiationException("Failed to instantiate component: $qualifier", e)
+            throw ComponentInstantiationException("Failed to instantiate component: $resolvingDefinition", e)
         }
 
-        instances[qualifier] = instance
-        resolving.remove(qualifier)
+        instances[resolvingDefinition] = instance
+        resolving.remove(resolvingDefinition)
 
         return instance
-    }
-
-    private fun gatherInitializeCalls(components: MutableMap<ComponentQualifier, Any>): List<() -> Any> =
-        components.values.flatMap { component ->
-            component::class.java.declaredMethods
-                .filter { it.isAnnotationPresent(Initialize::class.java) }
-                .map { method ->
-                    val parameters = method.parameters
-                        .map { resolveMethodParameter(it, components) }
-                        .toTypedArray()
-
-                    method.isAccessible = true
-                    { method.invoke(component, *parameters) }
-                }
-        }
-
-    private fun resolveMethodParameter(
-        parameter: Parameter,
-        components: MutableMap<ComponentQualifier, Any>
-    ): Any? {
-        val parameterComponentQualifier = mapParameterToComponentQualifier(parameter)
-        val matchingQualifier = findMatchingComponentQualifier(components.keys, parameterComponentQualifier)
-
-        return components[matchingQualifier]
-    }
-
-    private fun runInitializeCalls(initializeCalls: List<() -> Any>) {
-        for (call in initializeCalls) {
-            try {
-                call()
-            } catch (e: InvocationTargetException) {
-                throw InitializeMethodInvocationException("Failed to invoke @Initialize method", e)
-            }
-        }
-    }
-
-    private fun findMatchingComponentDescriptor(
-        componentDescriptors: Collection<ComponentDescriptor>,
-        inputQualifier: ComponentQualifier,
-    ): ComponentDescriptor? {
-        componentDescriptors.find { it.qualifier == inputQualifier }
-            ?.also { return it }
-
-        componentDescriptors.find { it.qualifier.type == inputQualifier.type }
-            ?.also { return it }
-
-        return null
-    }
-
-    private fun findMatchingComponentQualifier(
-        componentDescriptors: Collection<ComponentQualifier>,
-        inputQualifier: ComponentQualifier,
-    ): ComponentQualifier? {
-        componentDescriptors.find { it == inputQualifier }
-            ?.also { return it }
-
-        componentDescriptors.find { it.type == inputQualifier.type }
-            ?.also { return it }
-
-        return null
     }
 }
