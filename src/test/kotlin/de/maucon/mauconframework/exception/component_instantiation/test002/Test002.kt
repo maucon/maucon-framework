@@ -1,3 +1,0 @@
-package de.maucon.mauconframework.exception.component_instantiation.test002
-
-class Test002

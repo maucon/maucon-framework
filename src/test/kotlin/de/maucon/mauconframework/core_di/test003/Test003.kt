@@ -1,4 +1,4 @@
-package de.maucon.mauconframework.valid.test003
+package de.maucon.mauconframework.core_di.test003
 
 import de.maucon.mauconframework.annotation.Configuration
 import de.maucon.mauconframework.annotation.Injectable
