@@ -27,6 +27,7 @@ internal object InitializeRunner {
         components: Map<ComponentDefinition, Any>,
         instance: Any
     ): InitializeCallData {
+        val initialize = method.getAnnotation(Initialize::class.java)!!
         val parameters = method.parameters
             .map { resolveMethodParameter(method.name, componentDefinition, it, components) }
             .toTypedArray()
@@ -34,7 +35,7 @@ internal object InitializeRunner {
         method.isAccessible = true
         val runnable = { method.invoke(instance, *parameters) }
 
-        return InitializeCallData(componentDefinition, method.name, runnable)
+        return InitializeCallData(componentDefinition, initialize.priority, method.name, runnable)
     }
 
     private fun resolveMethodParameter(
@@ -50,13 +51,14 @@ internal object InitializeRunner {
         return components[matchingQualifier]
     }
 
-    internal fun runInitializeCalls(initializeCallData: List<InitializeCallData>) {
-        for (callData in initializeCallData) {
-            try {
-                callData.runnable()
-            } catch (e: InvocationTargetException) {
-                throw InitializeMethodInvocationException("Failed to invoke @Initialize method '${callData.methodName}' of component ${callData.componentDefinition}", e)
+    internal fun runInitializeCalls(initializeCallData: List<InitializeCallData>) =
+        initializeCallData
+            .sortedBy { it.priority }
+            .forEach {
+                try {
+                    it.runnable()
+                } catch (e: InvocationTargetException) {
+                    throw InitializeMethodInvocationException("Failed to invoke @Initialize method '${it.methodName}' of component ${it.componentDefinition}", e)
+                }
             }
-        }
-    }
 }
