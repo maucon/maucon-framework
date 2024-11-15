@@ -10,6 +10,14 @@ package de.maucon.mauconframework.annotation
  * The function annotated with `@Initialize` can also define parameters for other dependencies
  * provided by the dependency injection framework.
  *
+ * ### Priority
+ * The `priority` parameter allows you to control the order in which `@Initialize` methods
+ * are invoked within the dependency injection framework. Methods with a lower priority value
+ * are called before methods with higher priority values. By default, the priority is set to `1000000`.
+ *
+ * This can be useful when specific initialization methods must run before others to ensure
+ * proper setup of dependencies or configurations.
+ *
  * ### Example Usage
  * ```kotlin
  * @Injectable // or @Configuration
@@ -17,13 +25,15 @@ package de.maucon.mauconframework.annotation
  *     private val dependency: SomeDependency
  * ) {
  *     // Function will be called automatically after injection is complete
- *     @Initialize
+ *     @Initialize(priority = 1)
  *     fun setup(otherDependency: OtherDependency) {...}
- * }
  * ```
  *
+ * @property priority The priority value determining the order of execution. Lower values indicate higher precedence.
  * @see Injectable
  */
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Initialize
+annotation class Initialize(
+    val priority: Int = 1000000
+)
