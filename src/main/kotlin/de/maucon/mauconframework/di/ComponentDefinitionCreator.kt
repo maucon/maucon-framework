@@ -41,7 +41,7 @@ internal object ComponentDefinitionCreator {
 
     private fun mapAllConfigurationClassComponentDefinitions(clazz: Class<*>): List<ComponentDefinition> {
         val classComponentDefinition = mapConfigurationClassToComponentDefinition(clazz)
-        val methodComponentDefinitions = clazz.declaredMethods
+        val methodComponentDefinitions = clazz.methods
             .filter { it.isAnnotationPresent(Injectable::class.java) }
             .map { mapMethodToComponentDefinition(it, classComponentDefinition) }
 
