@@ -7,12 +7,16 @@ import de.maucon.mauconframework.initialize.method_invocation.test002.Configurat
 import de.maucon.mauconframework.initialize.method_invocation.test002.ServiceA
 import de.maucon.mauconframework.initialize.method_invocation.test002.Test002
 import de.maucon.mauconframework.initialize.method_invocation.test003.*
+import de.maucon.mauconframework.initialize.method_invocation.test004.SuperConfiguration
+import de.maucon.mauconframework.initialize.method_invocation.test004.Test004
+import de.maucon.mauconframework.initialize.method_invocation.test005.Test005
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @DisplayName("Initialize method invocation exceptions")
 class InitializeMethodInvocationTest {
@@ -43,5 +47,24 @@ class InitializeMethodInvocationTest {
         assertContains<Class<*>>(componentClasses, Service5::class.java)
 
         assertEquals(listOf(5, 4, 3, 2, 1), Test003.invocationOrder)
+    }
+
+    @Test
+    fun test004() {
+        val components = assertDoesNotThrow { MauConFramework.start(Test004::class.java) }
+        val componentClasses = components.map { it.javaClass }
+
+        assertContains<Class<*>>(componentClasses, SuperConfiguration::class.java)
+        assertTrue { Test004.subConfigInvocation }
+    }
+
+    @Test
+    fun test005() {
+        val components = assertDoesNotThrow { MauConFramework.start(Test005::class.java) }
+        val componentClasses = components.map { it.javaClass }
+
+        assertContains<Class<*>>(componentClasses, de.maucon.mauconframework.initialize.method_invocation.test005.SuperConfiguration::class.java)
+        assertContains<Class<*>>(componentClasses, de.maucon.mauconframework.initialize.method_invocation.test005.ServiceA::class.java)
+        assertTrue { Test005.subConfigInvocation }
     }
 }

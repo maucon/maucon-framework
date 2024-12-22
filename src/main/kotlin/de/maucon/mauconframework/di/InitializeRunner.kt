@@ -16,7 +16,7 @@ internal object InitializeRunner {
         components: Map<ComponentDefinition, Any>
     ): List<InitializeCallData> =
         components.flatMap { (componentDefinition, instance) ->
-            componentDefinition.type.declaredMethods
+            componentDefinition.type.methods
                 .filter { it.isAnnotationPresent(Initialize::class.java) }
                 .map { mapToInitializeCallData(it, componentDefinition, components, instance) }
         }
