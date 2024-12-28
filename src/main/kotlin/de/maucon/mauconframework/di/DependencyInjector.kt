@@ -2,18 +2,17 @@ package de.maucon.mauconframework.di
 
 import de.maucon.mauconframework.annotation.Configuration
 import de.maucon.mauconframework.annotation.Injectable
+import de.maucon.mauconframework.annotation.Logging
 import de.maucon.mauconframework.di.ComponentDefinitionCreator.mapConfigurationClassesToComponentDefinition
 import de.maucon.mauconframework.di.ComponentDefinitionCreator.mapInjectableClassesToComponentDefinition
 import de.maucon.mauconframework.di.DependencyMatcher.getComponentDefinitionByDependencyQualifier
 import de.maucon.mauconframework.di.InitializeRunner.gatherInitializeCallData
 import de.maucon.mauconframework.di.InitializeRunner.runInitializeCalls
 import de.maucon.mauconframework.di.data.ComponentDefinition
-import de.maucon.mauconframework.di.exception.ComponentInstantiationException
-import de.maucon.mauconframework.di.exception.CyclicDependencyException
-import de.maucon.mauconframework.di.exception.ResolveComponentException
-import de.maucon.mauconframework.di.exception.UnresolvedDependencyException
+import de.maucon.mauconframework.di.exception.*
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger(DependencyInjector::class.java)
@@ -86,6 +85,14 @@ internal object DependencyInjector {
         resolving.add(resolvingDefinition)
 
         val resolvedDependencies = resolvingDefinition.dependencies.map {
+            if (it.isLogger) {
+                if (it.type != Logger::class.java) {
+                    throw InvalidLoggerException("Dependency $it annotated with @${Logging::class.simpleName} must be of type ${Logger::class.qualifiedName}")
+                }
+
+                return@map LoggerFactory.getLogger(resolvingDefinition.type)
+            }
+
             val dependencyComponentDefinition = getComponentDefinitionByDependencyQualifier(resolvingDefinition, componentDefinitions, it)
                 ?: throw UnresolvedDependencyException("Unresolved dependency: $it required by $resolvingDefinition")
 
