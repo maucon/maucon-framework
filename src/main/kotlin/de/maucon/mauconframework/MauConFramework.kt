@@ -3,6 +3,7 @@ package de.maucon.mauconframework
 import de.maucon.mauconframework.MauConFramework.start
 import de.maucon.mauconframework.annotation.Injectable
 import de.maucon.mauconframework.di.DependencyInjector
+import org.slf4j.LoggerFactory
 
 /**
  * The main entry point for starting the dependency injection and instantiation process.
@@ -14,6 +15,8 @@ import de.maucon.mauconframework.di.DependencyInjector
  * @see start
  */
 object MauConFramework {
+    private val log = LoggerFactory.getLogger(MauConFramework::class.java)
+
     /**
      * Starts the dependency injection process by scanning the provided `baseClass` and all its subfolders,
      * instantiating the classes, and injecting their dependencies.
@@ -33,6 +36,9 @@ object MauConFramework {
      * @see Injectable
      */
     fun start(baseClass: Class<*>): Collection<Any> {
-        return DependencyInjector.instantiateClasses(baseClass)
+        val instantiateClasses = DependencyInjector.instantiateClasses(baseClass)
+
+        log.info("Started ${baseClass.simpleName}!")
+        return instantiateClasses
     }
 }
