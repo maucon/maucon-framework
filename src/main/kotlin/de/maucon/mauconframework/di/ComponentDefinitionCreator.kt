@@ -1,6 +1,7 @@
 package de.maucon.mauconframework.di
 
 import de.maucon.mauconframework.annotation.Injectable
+import de.maucon.mauconframework.annotation.Logging
 import de.maucon.mauconframework.annotation.Qualifier
 import de.maucon.mauconframework.di.data.ComponentDefinition
 import de.maucon.mauconframework.di.data.DependencyQualifier
@@ -16,12 +17,15 @@ internal object ComponentDefinitionCreator {
 
     internal fun mapParameterToDependencyQualifier(parameter: Parameter): DependencyQualifier {
         val name = parameter.getAnnotation(Qualifier::class.java)?.name?.lowercase()
-        return DependencyQualifier(parameter.type, name)
+        val isLogger = parameter.getAnnotation(Logging::class.java) != null
+
+        return DependencyQualifier(parameter.type, name, isLogger)
     }
 
     private fun mapInjectableClassToComponentDefinition(clazz: Class<*>): ComponentDefinition {
         val injectable = clazz.getAnnotation(Injectable::class.java)!!
         val name = injectable.name.ifEmpty { clazz.simpleName }.lowercase()
+
         return mapClassToComponentDefinition(clazz, name)
     }
 

@@ -5,7 +5,8 @@ package de.maucon.mauconframework.di.data
  **/
 internal data class DependencyQualifier(
     val type: Class<*>,
-    val name: String?
+    val name: String?,
+    val isLogger: Boolean = false
 ) {
-    override fun toString() = "'$name': ${type.simpleName} ($type)"
+    override fun toString() = "'$name': ${type.simpleName} ${if (isLogger) "[LOGGER]" else ""} ($type)"
 }
