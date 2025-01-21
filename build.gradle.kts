@@ -16,7 +16,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.16")
 
     testImplementation(kotlin("test"))
-    testImplementation("ch.qos.logback:logback-classic:1.5.15")
+    testImplementation("ch.qos.logback:logback-classic:1.5.16")
 }
 
 tasks.test {
