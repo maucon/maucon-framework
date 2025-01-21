@@ -5,6 +5,7 @@ import de.maucon.mauconframework.annotation.Logging
 import de.maucon.mauconframework.annotation.Qualifier
 import de.maucon.mauconframework.di.data.ComponentDefinition
 import de.maucon.mauconframework.di.data.DependencyQualifier
+import de.maucon.mauconframework.di.exception.InvalidInjectableConstructorException
 import java.lang.reflect.Method
 import java.lang.reflect.Parameter
 
@@ -35,12 +36,21 @@ internal object ComponentDefinitionCreator {
     }
 
     private fun mapClassToComponentDefinition(clazz: Class<*>, name: String): ComponentDefinition {
-        val classConstructor = clazz.constructors.first() // what when multiple constructors are found?
+        if (clazz.constructors.isNotEmpty()) {
+            val classConstructor = clazz.constructors.first() // what when multiple constructors are found?
 
-        val dependencies = mapParametersToDependencyQualifier(classConstructor.parameters.asList())
-        val constructor = { args: Array<*> -> classConstructor.newInstance(*args) }
+            val dependencies = mapParametersToDependencyQualifier(classConstructor.parameters.asList())
+            val constructor = { args: Array<*> -> classConstructor.newInstance(*args) }
+            return ComponentDefinition(clazz, name, dependencies, constructor)
+        }
 
-        return ComponentDefinition(clazz, name, dependencies, constructor)
+        // if kotlin object class
+        clazz.kotlin.objectInstance?.also {
+            val constructor = { _: Array<*> -> it }
+            return ComponentDefinition(clazz, name, listOf(), constructor)
+        }
+
+        throw InvalidInjectableConstructorException("Error finding suitable constructor for $name ($clazz)")
     }
 
     private fun mapAllConfigurationClassComponentDefinitions(clazz: Class<*>): List<ComponentDefinition> {

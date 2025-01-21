@@ -9,6 +9,11 @@ import de.maucon.mauconframework.core_di.test005.Test005
 import de.maucon.mauconframework.core_di.test006.ServiceA
 import de.maucon.mauconframework.core_di.test006.ServiceB
 import de.maucon.mauconframework.core_di.test006.Test006
+import de.maucon.mauconframework.core_di.test007.ConfigurationA
+import de.maucon.mauconframework.core_di.test007.Test007
+import de.maucon.mauconframework.core_di.test008.ClassB
+import de.maucon.mauconframework.core_di.test008.ObjectA
+import de.maucon.mauconframework.core_di.test008.Test008
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -68,5 +73,22 @@ class ValidTest {
 
         assertContains<Class<*>>(componentClasses, ServiceA::class.java)
         assertContains<Class<*>>(componentClasses, ServiceB::class.java)
+    }
+
+    @Test
+    fun test007() {
+        val components = assertDoesNotThrow { MauConFramework.start(Test007::class.java) }
+        val componentClasses = components.map { it.javaClass }
+
+        assertContains<Class<*>>(componentClasses, ConfigurationA::class.java)
+    }
+
+    @Test
+    fun test008() {
+        val components = assertDoesNotThrow { MauConFramework.start(Test008::class.java) }
+        val componentClasses = components.map { it.javaClass }
+
+        assertContains<Class<*>>(componentClasses, ObjectA::class.java)
+        assertContains<Class<*>>(componentClasses, ClassB::class.java)
     }
 }

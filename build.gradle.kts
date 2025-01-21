@@ -4,13 +4,14 @@ plugins {
 }
 
 group = "de.maucon"
-version = "1.5.0"
+version = "1.6.0"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
     implementation("org.reflections:reflections:0.10.2")
     implementation("org.slf4j:slf4j-api:2.0.16")
 
