@@ -1,7 +1,6 @@
 package de.maucon.mauconframework.event.service
 
 import de.maucon.mauconframework.di.data.ComponentDefinition
-import de.maucon.mauconframework.event.Event
 import de.maucon.mauconframework.event.EventBus
 import de.maucon.mauconframework.event.EventSubscriber
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +11,7 @@ import java.lang.reflect.Method
 internal object EventService {
     private val log = LoggerFactory.getLogger(EventService::class.java)
 
-    internal fun registerEventsAsync(
+    internal fun registerEventsAsync( // TODO remove async
         components: Map<ComponentDefinition, Any>,
         scope: CoroutineScope
     ) {
@@ -45,13 +44,8 @@ internal object EventService {
             throw RuntimeException("TODO") // TODO
         }
 
-        val potentialEventType = parameters.first()
-        if (!Event::class.java.isAssignableFrom(potentialEventType)) {
-            throw RuntimeException("TODO") // TODO
-        }
-
         @Suppress("UNCHECKED_CAST")
-        val eventType = potentialEventType as Class<Event>
+        val eventType = parameters.first() as Class<Any>
 
         method.isAccessible = true
         val registerSubscriber = suspend { EventBus.subscribe(eventType) { method.invoke(instance, it) } }

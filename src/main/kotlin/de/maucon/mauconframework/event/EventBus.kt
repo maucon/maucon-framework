@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.filter
 object EventBus {
     private val flow = MutableSharedFlow<Any>()
 
-    suspend fun <T : Event> publish(event: T) {
+    suspend fun <T : Any> publish(event: T) {
         flow.emit(event)
     }
 
-    suspend fun <T : Event> subscribe(
+    suspend fun <T : Any> subscribe(
         eventType: Class<T>,
         collector: suspend (T) -> Unit
     ) {

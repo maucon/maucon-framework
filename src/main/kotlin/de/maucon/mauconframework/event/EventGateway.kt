@@ -1,7 +1,7 @@
 package de.maucon.mauconframework.event
 
 object EventGateway {
-    suspend fun <T : Event> apply(event: T) {
+    suspend fun <T : Any> apply(event: T) {
         EventBus.publish(event)
     }
 }

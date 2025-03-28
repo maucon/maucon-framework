@@ -47,7 +47,7 @@ object MauConFramework {
         return components.values
     }
 
-    // TODO doc
+    // TODO remove
     fun startAsync(
         baseClass: Class<*>,
         scope: CoroutineScope
