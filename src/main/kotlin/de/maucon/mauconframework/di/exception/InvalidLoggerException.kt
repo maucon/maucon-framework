@@ -1,6 +1,6 @@
 package de.maucon.mauconframework.di.exception
 
-import de.maucon.mauconframework.annotation.Logging
+import de.maucon.mauconframework.di.annotation.Logging
 
 /**
  * Exception thrown when the [Logging] annotation is used on an invalid parameter type.
