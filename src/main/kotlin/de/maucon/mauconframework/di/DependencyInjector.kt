@@ -1,13 +1,11 @@
 package de.maucon.mauconframework.di
 
-import de.maucon.mauconframework.annotation.Configuration
-import de.maucon.mauconframework.annotation.Injectable
-import de.maucon.mauconframework.annotation.Logging
+import de.maucon.mauconframework.di.annotation.Configuration
+import de.maucon.mauconframework.di.annotation.Injectable
+import de.maucon.mauconframework.di.annotation.Logging
 import de.maucon.mauconframework.di.ComponentDefinitionCreator.mapConfigurationClassesToComponentDefinition
 import de.maucon.mauconframework.di.ComponentDefinitionCreator.mapInjectableClassesToComponentDefinition
 import de.maucon.mauconframework.di.DependencyMatcher.getComponentDefinitionByDependencyQualifier
-import de.maucon.mauconframework.di.InitializeRunner.gatherInitializeCallData
-import de.maucon.mauconframework.di.InitializeRunner.runInitializeCalls
 import de.maucon.mauconframework.di.data.ComponentDefinition
 import de.maucon.mauconframework.di.exception.*
 import org.reflections.Reflections
@@ -18,7 +16,7 @@ import org.slf4j.LoggerFactory
 private val log = LoggerFactory.getLogger(DependencyInjector::class.java)
 
 internal object DependencyInjector {
-    internal fun instantiateClasses(startingClass: Class<*>): Collection<Any> {
+    internal fun instantiateClasses(startingClass: Class<*>): Map<ComponentDefinition, Any> {
         val reflection = Reflections(startingClass)
 
         val injectableClasses = scanForAnnotatedClasses(reflection, Injectable::class.java)
@@ -32,12 +30,7 @@ internal object DependencyInjector {
         val components = instantiateComponents(componentDefinitions)
         log.debug("Resolved ${components.size} components")
 
-        val initializeCallData = gatherInitializeCallData(components)
-        log.debug("Running ${initializeCallData.size} initialize calls")
-
-        runInitializeCalls(initializeCallData)
-
-        return components.values
+        return components
     }
 
     private fun scanForAnnotatedClasses(

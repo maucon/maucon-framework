@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.20"
     `maven-publish`
 }
 
 group = "de.maucon"
-version = "1.6.0"
+version = "1.7.0"
 
 repositories {
     mavenCentral()
@@ -13,10 +13,11 @@ repositories {
 dependencies {
     implementation(kotlin("reflect"))
     implementation("org.reflections:reflections:0.10.2")
-    implementation("org.slf4j:slf4j-api:2.0.16")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
 
     testImplementation(kotlin("test"))
-    testImplementation("ch.qos.logback:logback-classic:1.5.16")
+    testImplementation("ch.qos.logback:logback-classic:1.5.18")
 }
 
 tasks.test {

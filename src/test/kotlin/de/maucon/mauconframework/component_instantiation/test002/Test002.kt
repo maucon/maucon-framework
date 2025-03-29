@@ -1,3 +1,0 @@
-package de.maucon.mauconframework.component_instantiation.test002
-
-class Test002

@@ -1,8 +1,8 @@
 package de.maucon.mauconframework.di
 
-import de.maucon.mauconframework.annotation.Injectable
-import de.maucon.mauconframework.annotation.Logging
-import de.maucon.mauconframework.annotation.Qualifier
+import de.maucon.mauconframework.di.annotation.Injectable
+import de.maucon.mauconframework.di.annotation.Logging
+import de.maucon.mauconframework.di.annotation.Qualifier
 import de.maucon.mauconframework.di.data.ComponentDefinition
 import de.maucon.mauconframework.di.data.DependencyQualifier
 import de.maucon.mauconframework.di.exception.InvalidInjectableConstructorException
