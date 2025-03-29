@@ -4,9 +4,6 @@ import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.di.annotation.Injectable
 import de.maucon.mauconframework.event.EventGateway
 import de.maucon.mauconframework.event.EventSubscriber
-import de.maucon.mauconframework.event.test003.EventSub1
-import de.maucon.mauconframework.event.test003.EventSub2
-import de.maucon.mauconframework.event.test003.Test003
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -23,7 +20,7 @@ object Test002 {
     @Test
     fun test001() = runBlocking {
         val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.startAsync(Test003::class.java, this) }
+            val components = assertDoesNotThrow { MauConFramework.startAsync(Test002::class.java, this) }
             val componentClasses = components.map { it.javaClass }
             assertContains<Class<*>>(componentClasses, EventSub1::class.java)
             assertContains<Class<*>>(componentClasses, EventSub2::class.java)

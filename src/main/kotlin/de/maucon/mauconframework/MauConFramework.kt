@@ -1,6 +1,7 @@
 package de.maucon.mauconframework
 
 import de.maucon.mauconframework.MauConFramework.start
+import de.maucon.mauconframework.command.service.CommandService
 import de.maucon.mauconframework.di.DependencyInjector
 import de.maucon.mauconframework.di.annotation.Injectable
 import de.maucon.mauconframework.event.service.EventService
@@ -42,12 +43,13 @@ object MauConFramework {
         val components = DependencyInjector.instantiateClasses(baseClass)
 
         InitializerService.runInitializers(components)
+        CommandService.registerCommands(components)
 
         log.info("Started ${baseClass.simpleName}!")
         return components.values
     }
 
-    // TODO remove
+    // FIXME
     fun startAsync(
         baseClass: Class<*>,
         scope: CoroutineScope
@@ -56,6 +58,7 @@ object MauConFramework {
 
         InitializerService.runInitializersAsync(components, scope)
         EventService.registerEventsAsync(components, scope)
+        CommandService.registerCommands(components)
 
         log.info("[ASYNC] Started ${baseClass.simpleName}!")
         return components.values
