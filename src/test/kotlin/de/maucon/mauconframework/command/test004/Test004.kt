@@ -23,8 +23,8 @@ object Test004 {
 
         val cmd = CommandGateway.apply(TestCommand())
 
-        assertEquals(1, cmd.count)
-        assertEquals(listOf(1), cmd.callList)
+        assertEquals(3, cmd.count)
+        assertEquals(listOf(1, 2, 3), cmd.callList)
     }
 }
 

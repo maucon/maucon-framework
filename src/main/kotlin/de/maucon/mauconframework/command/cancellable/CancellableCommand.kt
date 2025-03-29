@@ -1,5 +1,10 @@
 package de.maucon.mauconframework.command.cancellable
 
+/**
+ * Abstract class representing a cancellable command.
+ *
+ * Extends the `Cancellable` interface, allowing commands to be cancelled before execution.
+ */
 abstract class CancellableCommand : Cancellable {
     private var isCancelled = false
 
@@ -9,6 +14,9 @@ abstract class CancellableCommand : Cancellable {
         isCancelled = cancel
     }
 
+    /**
+     * Cancels the command, preventing further execution.
+     */
     fun cancel() {
         isCancelled = true
     }

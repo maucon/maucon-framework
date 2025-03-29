@@ -32,7 +32,7 @@ object CommandBus {
         var isCancelled = command.isCancelled()
 
         for (handler in commandHandlers) {
-            if (isCancelled && !handler.ignoreCancelled) continue
+            if (isCancelled && handler.ignoreCancelled) continue
 
             @Suppress("UNCHECKED_CAST")
             invokeCommandHandler((handler as CommandHandlerData<T>), command)
