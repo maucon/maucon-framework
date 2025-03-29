@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 @DisplayName("Different commands")
 object Test006 {
     @Test
-    fun test002() {
+    fun test006() {
         val components = assertDoesNotThrow { MauConFramework.start(Test006::class.java) }
         val componentClasses = components.map { it.javaClass }
         assertContains<Class<*>>(componentClasses, CommandHandler1::class.java)

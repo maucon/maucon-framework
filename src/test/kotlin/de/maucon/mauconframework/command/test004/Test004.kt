@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 @DisplayName("Cancelled command")
 object Test004 {
     @Test
-    fun test002() {
+    fun test004() {
         val components = assertDoesNotThrow { MauConFramework.start(Test004::class.java) }
         val componentClasses = components.map { it.javaClass }
         assertContains<Class<*>>(componentClasses, CommandHandler1::class.java)

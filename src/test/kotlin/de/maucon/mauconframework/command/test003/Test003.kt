@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 @DisplayName("Command handler with priority")
 object Test003 {
     @Test
-    fun test002() {
+    fun test003() {
         val components = assertDoesNotThrow { MauConFramework.start(Test003::class.java) }
         val componentClasses = components.map { it.javaClass }
         assertContains<Class<*>>(componentClasses, CommandHandler1::class.java)

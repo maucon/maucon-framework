@@ -1,6 +1,8 @@
 package de.maucon.mauconframework.command
 
 data class CommandHandlerData<T>(
+    val handlerClassType: Class<*>,
+    val handlerMethodName: String,
     val commandType: Class<T>,
     val priority: Int,
     val ignoreCancelled: Boolean,

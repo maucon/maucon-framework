@@ -17,7 +17,7 @@ object Test003 {
     var upperCallCounter = 0
 
     @Test
-    fun test001() = runBlocking {
+    fun test003() = runBlocking {
         val job = CoroutineScope(Dispatchers.Default).launch {
             val components = assertDoesNotThrow { MauConFramework.startAsync(Test003::class.java, this) }
             val componentClasses = components.map { it.javaClass }

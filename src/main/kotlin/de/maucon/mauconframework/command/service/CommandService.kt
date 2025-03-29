@@ -3,6 +3,7 @@ package de.maucon.mauconframework.command.service
 import de.maucon.mauconframework.command.CommandBus
 import de.maucon.mauconframework.command.CommandHandler
 import de.maucon.mauconframework.command.CommandHandlerData
+import de.maucon.mauconframework.command.exception.InvalidCommandHandlerParameterSizeException
 import de.maucon.mauconframework.di.data.ComponentDefinition
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
@@ -37,7 +38,9 @@ internal object CommandService {
 
         val parameters = method.parameterTypes
         if (parameters.size != 1) {
-            throw RuntimeException("TODO ") // TODO
+            throw InvalidCommandHandlerParameterSizeException(
+                "Event subscriber '${method}' of ${componentDefinition.type.simpleName} (${componentDefinition.type}) must have exactly one parameter, but has ${parameters.size}"
+            )
         }
 
         @Suppress("UNCHECKED_CAST")
@@ -45,9 +48,15 @@ internal object CommandService {
 
         method.isAccessible = true
 
-
         val registerHandler = {
-            val handlerData = CommandHandlerData(eventType, annotation.priority, annotation.ignoreCancelled) { method.invoke(instance, it) }
+            val handlerData = CommandHandlerData(
+                componentDefinition.type,
+                method.name,
+                eventType,
+                annotation.priority,
+                annotation.ignoreCancelled
+            ) { method.invoke(instance, it) }
+
             CommandBus.register(handlerData)
         }
 

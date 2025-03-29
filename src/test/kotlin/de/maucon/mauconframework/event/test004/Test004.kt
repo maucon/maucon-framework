@@ -1,4 +1,4 @@
-package de.maucon.mauconframework.event.test002
+package de.maucon.mauconframework.event.test004
 
 import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.di.annotation.Injectable
@@ -11,16 +11,14 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-@DisplayName("Multiple event subscriber")
-object Test002 {
-    var callCounter1 = 0
-    var callCounter2 = 0
-    var callCounter3 = 0
+@DisplayName("Event subscriber throwing exception")
+object Test004 {
+    var callCounter = 0
 
     @Test
-    fun test002() = runBlocking {
+    fun test004() = runBlocking {
         val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.startAsync(Test002::class.java, this) }
+            val components = assertDoesNotThrow { MauConFramework.startAsync(Test004::class.java, this) }
             val componentClasses = components.map { it.javaClass }
             assertContains<Class<*>>(componentClasses, EventSub1::class.java)
             assertContains<Class<*>>(componentClasses, EventSub2::class.java)
@@ -33,9 +31,7 @@ object Test002 {
         }
         job.join()
 
-        assertEquals(3, callCounter1)
-        assertEquals(3, callCounter2)
-        assertEquals(3, callCounter3)
+        assertEquals(6, callCounter)
     }
 }
 
@@ -44,7 +40,9 @@ class EventSub1 {
     @EventSubscriber
     fun on(event: TestEvent) {
         println("EventSub1: got event: $event")
-        Test002.callCounter1++
+        Test004.callCounter++
+
+        throw RuntimeException("EventSub throws exception")
     }
 }
 
@@ -53,16 +51,7 @@ class EventSub2 {
     @EventSubscriber
     fun on(event: TestEvent) {
         println("EventSub2: got event: $event")
-        Test002.callCounter2++
-    }
-}
-
-@Injectable
-class EventSub3 {
-    @EventSubscriber
-    fun on(event: TestEvent) {
-        println("EventSub3: got event: $event")
-        Test002.callCounter3++
+        Test004.callCounter++
     }
 }
 
