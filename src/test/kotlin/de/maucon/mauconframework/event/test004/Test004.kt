@@ -18,7 +18,7 @@ object Test004 {
     @Test
     fun test004() = runBlocking {
         val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.startAsync(Test004::class.java, this) }
+            val components = assertDoesNotThrow { MauConFramework.start(Test004::class.java, this) }
             val componentClasses = components.map { it.javaClass }
             assertContains<Class<*>>(componentClasses, EventSub1::class.java)
             assertContains<Class<*>>(componentClasses, EventSub2::class.java)

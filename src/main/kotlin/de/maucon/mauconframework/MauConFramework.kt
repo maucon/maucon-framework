@@ -7,6 +7,7 @@ import de.maucon.mauconframework.di.annotation.Injectable
 import de.maucon.mauconframework.event.service.EventService
 import de.maucon.mauconframework.initializer.InitializerService
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.slf4j.LoggerFactory
 
 /**
@@ -38,29 +39,18 @@ object MauConFramework {
      * @return A collection of instantiated objects that have been injected with their dependencies.
 
      * @see Injectable
-     */ // TODO doc update
-    fun start(baseClass: Class<*>): Collection<Any> {
-        val components = DependencyInjector.instantiateClasses(baseClass)
-
-        InitializerService.runInitializers(components)
-        CommandService.registerCommands(components)
-
-        log.info("Started ${baseClass.simpleName}!")
-        return components.values
-    }
-
-    // FIXME
-    fun startAsync(
+     */
+    fun start(
         baseClass: Class<*>,
-        scope: CoroutineScope
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     ): Collection<Any> {
         val components = DependencyInjector.instantiateClasses(baseClass)
 
-        InitializerService.runInitializersAsync(components, scope)
-        EventService.registerEventsAsync(components, scope)
+        InitializerService.runInitializers(components)
+        EventService.registerEvents(components, scope)
         CommandService.registerCommands(components)
 
-        log.info("[ASYNC] Started ${baseClass.simpleName}!")
+        log.info("Started ${baseClass.simpleName}!")
         return components.values
     }
 }

@@ -13,7 +13,7 @@ import java.lang.reflect.Method
 internal object EventService {
     private val log = LoggerFactory.getLogger(EventService::class.java)
 
-    internal fun registerEventsAsync( // TODO remove async
+    internal fun registerEvents(
         components: Map<ComponentDefinition, Any>,
         scope: CoroutineScope
     ) {

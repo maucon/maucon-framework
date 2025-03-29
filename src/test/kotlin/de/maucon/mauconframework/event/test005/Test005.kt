@@ -13,7 +13,7 @@ import org.junit.jupiter.api.assertThrows
 object Test005 {
     @Test
     fun test() = runBlocking {
-        val exception = assertThrows<InvalidEventSubscriberParameterSizeException> { MauConFramework.startAsync(Test005::class.java, this) }
+        val exception = assertThrows<InvalidEventSubscriberParameterSizeException> { MauConFramework.start(Test005::class.java, this) }
         exception.printStackTrace()
     }
 }

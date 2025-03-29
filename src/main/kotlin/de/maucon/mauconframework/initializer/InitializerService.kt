@@ -5,7 +5,6 @@ import de.maucon.mauconframework.di.DependencyMatcher.getComponentDefinitionByDe
 import de.maucon.mauconframework.di.data.ComponentDefinition
 import de.maucon.mauconframework.initializer.exception.InitializeMethodInvocationException
 import de.maucon.mauconframework.initializer.exception.InitializeMethodUnresolvedDependencyException
-import kotlinx.coroutines.CoroutineScope
 import org.slf4j.LoggerFactory
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -29,13 +28,6 @@ internal object InitializerService {
                     throw InitializeMethodInvocationException("Failed to invoke @${Initializer::class.simpleName} method '${info.methodName}' of component ${info.componentDefinition}", e)
                 }
             }
-    }
-
-    internal fun runInitializersAsync(
-        components: Map<ComponentDefinition, Any>,
-        scope: CoroutineScope
-    ) {
-        runInitializers(components) // FIXME
     }
 
     private fun gatherInitializerInfo(components: Map<ComponentDefinition, Any>): List<InitializerInfo> =
