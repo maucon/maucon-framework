@@ -2,6 +2,7 @@ package de.maucon.mauconframework.event
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
@@ -10,6 +11,11 @@ import kotlinx.coroutines.launch
  * This object provides a method to publish events asynchronously using the `EventBus`.
  */
 object EventGateway {
+    /**
+     * A shared coroutine scope used for asynchronous event publishing.
+     */
+    private val eventScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     /**
      * Publishes the given event to the event bus.
      *
@@ -22,18 +28,15 @@ object EventGateway {
     }
 
     /**
-     * Publishes the given event to the event bus using the provided coroutine scope.
+     * Publishes the given event to the event bus asynchronously using the shared coroutine scope.
      *
-     * If no scope is provided, a new one will be created using [Dispatchers.Default].
-     * This is useful when publishing events from non-coroutine contexts.
+     * This method is non-blocking and intended for use in non-suspending contexts.
+     * It launches a coroutine on the shared [eventScope].
      *
      * @param event The event instance to be published.
      */
-    fun <T : Any> launchPublish(
-        event: T,
-        scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-    ) {
-        scope.launch {
+    fun <T : Any> launchPublish(event: T) {
+        eventScope.launch {
             EventBus.publish(event)
         }
     }

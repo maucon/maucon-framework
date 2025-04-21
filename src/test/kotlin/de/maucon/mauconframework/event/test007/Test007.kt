@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
@@ -16,7 +17,7 @@ private val log = LoggerFactory.getLogger(Test007::class.java)
 
 @DisplayName("Using async launch publish")
 object Test007 {
-    var callCounter = 0
+    var callCounter = AtomicInteger(0)
 
     @Test
     fun test001() = runBlocking {
@@ -34,7 +35,7 @@ object Test007 {
         }
         delay(10)
 
-        assertEquals(3, callCounter)
+        assertEquals(3, callCounter.get())
     }
 }
 
@@ -43,7 +44,7 @@ class EventSub {
     @EventSubscriber
     fun on(event: TestEvent) {
         log.info("got event: $event")
-        Test007.callCounter++
+        Test007.callCounter.incrementAndGet()
     }
 }
 
