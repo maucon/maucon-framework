@@ -1,4 +1,4 @@
-package de.maucon.mauconframework.event.test002
+package de.maucon.mauconframework.event.test008
 
 import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.di.annotation.Injectable
@@ -8,34 +8,35 @@ import kotlinx.coroutines.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
-@DisplayName("Multiple event subscriber")
-object Test002 {
-    var callCounter1 = 0
-    var callCounter2 = 0
-    var callCounter3 = 0
+private val log = LoggerFactory.getLogger(Test008::class.java)
+
+@DisplayName("Exception in subscriber with async launch publish")
+object Test008 {
+    var callCounter = AtomicInteger(0)
 
     @Test
-    fun test002() = runBlocking {
+    fun test001() = runBlocking {
         val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.start(Test002::class.java, this) }
+            val components = assertDoesNotThrow { MauConFramework.start(Test008::class.java) }
             val componentClasses = components.map { it.javaClass }
             assertContains<Class<*>>(componentClasses, EventSub1::class.java)
             assertContains<Class<*>>(componentClasses, EventSub2::class.java)
 
-            for (i in 0..2) {
-                delay(10)
-                EventGateway.publish(TestEvent("test$i"))
-            }
-            cancel()
         }
         job.join()
 
-        assertEquals(3, callCounter1)
-        assertEquals(3, callCounter2)
-        assertEquals(3, callCounter3)
+        for (i in 0..1) {
+            delay(10)
+            EventGateway.launchPublish(TestEvent("Test001 $i"))
+        }
+        delay(10)
+
+        assertEquals(2, callCounter.get())
     }
 }
 
@@ -43,8 +44,9 @@ object Test002 {
 class EventSub1 {
     @EventSubscriber
     fun on(event: TestEvent) {
-        println("EventSub1: got event: $event")
-        Test002.callCounter1++
+        throw RuntimeException("EventSub1 exception")
+        log.info("EventSub1: got event: $event")
+        Test008.callCounter.incrementAndGet()
     }
 }
 
@@ -52,17 +54,8 @@ class EventSub1 {
 class EventSub2 {
     @EventSubscriber
     fun on(event: TestEvent) {
-        println("EventSub2: got event: $event")
-        Test002.callCounter2++
-    }
-}
-
-@Injectable
-class EventSub3 {
-    @EventSubscriber
-    fun on(event: TestEvent) {
-        println("EventSub3: got event: $event")
-        Test002.callCounter3++
+        log.info("EventSub2: got event: $event")
+        Test008.callCounter.incrementAndGet()
     }
 }
 

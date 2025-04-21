@@ -25,7 +25,7 @@ object Test004 {
 
             for (i in 0..2) {
                 delay(10)
-                EventGateway.apply(TestEvent("test$i"))
+                EventGateway.publish(TestEvent("test$i"))
             }
             cancel()
         }
