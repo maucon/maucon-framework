@@ -26,8 +26,8 @@ object Test003 {
 
             for (i in 0..2) {
                 delay(10)
-                EventGateway.apply(UpperEvent("test$i"))
-                EventGateway.apply(GenericEvent())
+                EventGateway.publish(UpperEvent("test$i"))
+                EventGateway.publish(GenericEvent())
             }
             cancel()
         }
