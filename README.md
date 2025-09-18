@@ -1,4 +1,4 @@
-# MauCon-Framework [![Build](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml) [![Release](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml)
+# MauCon-Framework [![Build](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml) [![Release](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml) [![](https://jitpack.io/v/maucon/maucon-framework.svg)](https://jitpack.io/#maucon/maucon-framework)
 
 MauConFramework is a lightweight and flexible dependency injection (DI) framework written in Kotlin. It provides a simple yet powerful way to manage dependencies in your
 Kotlin applications, making it easier to configure, instantiate, and inject dependencies across different components in your system.
@@ -19,12 +19,12 @@ management of entities and repositories in your application.
 
 ### Gradle
 
-Set up the GitHub Maven repository with your credentials:
+Set up the JitPack repository:
 
 ```kotlin
 repositories {
-    maven {
-        url = uri("https://maven.pkg.github.com/maucon/maucon-framework")
+    maven("https://jitpack.io") {
+        name = "jitpack-repo"
     }
 }
 ```
@@ -33,6 +33,6 @@ Add the following dependency:
 
 ```kotlin
 dependencies {
-    implementation("de.maucon:maucon-framework:<version>")
+     implementation("com.github.maucon:maucon-framework:v1.9.0")
 }
 ```
