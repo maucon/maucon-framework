@@ -1,4 +1,4 @@
-# MauCon-Framework [![Build](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml)
+# MauCon-Framework [![Build](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml) [![Release](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml)
 
 MauConFramework is a lightweight and flexible dependency injection (DI) framework written in Kotlin. It provides a simple yet powerful way to manage dependencies in your
 Kotlin applications, making it easier to configure, instantiate, and inject dependencies across different components in your system.
@@ -25,10 +25,6 @@ Set up the GitHub Maven repository with your credentials:
 repositories {
     maven {
         url = uri("https://maven.pkg.github.com/maucon/maucon-framework")
-        credentials {
-            username = "<GITHUB_USERNAME>"
-            password = "<GITHUB_TOKEN>"
-        }
     }
 }
 ```
