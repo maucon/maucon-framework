@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.2.20"
     `maven-publish`
 }
 
 group = "de.maucon"
-version = "1.8.0"
+version = "1.9.0"
 
 repositories {
     mavenCentral()
