@@ -1,6 +1,5 @@
 package de.maucon.mauconframework.event
 
-import de.maucon.mauconframework.event.EventGateway.eventScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
