@@ -33,6 +33,6 @@ Add the following dependency:
 
 ```kotlin
 dependencies {
-     implementation("com.github.maucon:maucon-framework:v1.9.0")
+    implementation("com.github.maucon:maucon-framework:v1.9.0")
 }
 ```
