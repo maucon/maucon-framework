@@ -1,23 +1,23 @@
 plugins {
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.3.20"
     `maven-publish`
 }
 
 group = "de.maucon"
-version = "1.9.0"
+version = "2.0.0"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(kotlin("reflect"))
+    implementation(kotlin("reflect", "2.3.20"))
     implementation("org.reflections:reflections:0.10.2")
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-    testImplementation(kotlin("test"))
-    testImplementation("ch.qos.logback:logback-classic:1.5.18")
+    testImplementation(kotlin("test", "2.3.10"))
+    testImplementation("ch.qos.logback:logback-classic:1.5.32")
 }
 
 tasks.test {

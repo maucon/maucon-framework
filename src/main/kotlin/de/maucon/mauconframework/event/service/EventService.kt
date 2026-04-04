@@ -5,27 +5,19 @@ import de.maucon.mauconframework.event.EventBus
 import de.maucon.mauconframework.event.EventSubscriber
 import de.maucon.mauconframework.event.EventSubscriberData
 import de.maucon.mauconframework.event.exception.InvalidEventSubscriberParameterSizeException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
 
 internal object EventService {
     private val log = LoggerFactory.getLogger(EventService::class.java)
 
-    internal fun registerEvents(
-        components: Map<ComponentDefinition, Any>,
-        scope: CoroutineScope
-    ) {
+    internal fun registerEvents(components: Map<ComponentDefinition, Any>) {
         val subscriberInfos = gatherEventSubscriberInfos(components)
         log.debug("Registering ${subscriberInfos.size} event subscriber")
 
-        subscriberInfos.forEach { info ->
-            scope.launch {
-                log.debug("Register subscriber for '{}' in '{}' of {}", info.eventType.simpleName, info.methodName, info.componentDefinition)
-
-                info.registerSubscriber()
-            }
+        subscriberInfos.forEach {
+            log.debug("Register subscriber for '{}' in '{}' of {}", it.eventType.simpleName, it.methodName, it.componentDefinition)
+            it.registerSubscriber()
         }
     }
 
@@ -41,6 +33,8 @@ internal object EventService {
         componentDefinition: ComponentDefinition,
         instance: Any
     ): EventSubscriberInfo {
+        val annotation = method.getAnnotation(EventSubscriber::class.java)!!
+
         val parameters = method.parameterTypes
         if (parameters.size != 1) {
             throw InvalidEventSubscriberParameterSizeException(
@@ -56,10 +50,11 @@ internal object EventService {
         val subscriberData = EventSubscriberData(
             componentDefinition.type,
             method.name,
-            eventType
+            eventType,
+            annotation.sync
         ) { method.invoke(instance, it) }
-        val registerSubscriber = suspend { EventBus.subscribe(subscriberData) }
 
+        val registerSubscriber = { EventBus.subscribe(subscriberData) }
         return EventSubscriberInfo(componentDefinition, method.name, eventType, registerSubscriber)
     }
 }

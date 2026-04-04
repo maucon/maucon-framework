@@ -6,5 +6,5 @@ internal data class EventSubscriberInfo(
     val componentDefinition: ComponentDefinition,
     val methodName: String,
     val eventType: Class<*>,
-    val registerSubscriber: suspend () -> Unit,
+    val registerSubscriber: () -> Unit,
 )
