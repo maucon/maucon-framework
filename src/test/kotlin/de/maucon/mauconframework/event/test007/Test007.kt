@@ -31,7 +31,7 @@ object Test007 {
 
         for (i in 0..2) {
             delay(10)
-            EventGateway.launchPublish(TestEvent("Test001 $i"))
+            EventGateway.publish(TestEvent("Test001 $i"))
         }
         delay(10)
 

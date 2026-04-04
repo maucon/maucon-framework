@@ -4,14 +4,13 @@ import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.di.annotation.Injectable
 import de.maucon.mauconframework.event.EventGateway
 import de.maucon.mauconframework.event.EventSubscriber
-import de.maucon.mauconframework.event.test007.Test007
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.atomics.AtomicInt
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
@@ -23,18 +22,15 @@ object Test001 {
 
     @Test
     fun test001() = runBlocking {
-        val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.start(Test001::class.java) }
-            val componentClasses = components.map { it.javaClass }
-            assertContains<Class<*>>(componentClasses, EventSub::class.java)
+        val components = assertDoesNotThrow { MauConFramework.start(Test001::class.java) }
+        val componentClasses = components.map { it.javaClass }
+        assertContains<Class<*>>(componentClasses, EventSub::class.java)
 
-            for (i in 0..2) {
-                delay(10)
-                EventGateway.publish(TestEvent("Test001 $i"))
-            }
-            cancel()
+        for (i in 0..2) {
+            delay(10)
+            EventGateway.publish(TestEvent("Test001 $i"))
         }
-        job.join()
+        delay(10)
 
         assertEquals(3, callCounter.get())
     }

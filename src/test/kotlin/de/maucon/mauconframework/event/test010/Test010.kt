@@ -33,9 +33,9 @@ object Test010 {
 
         for (i in 0..1) {
             delay(10)
-            EventGateway.launchPublish(externalScope, TestEvent("launchPublish externalScope Test001 $i"))
+            EventGateway.publish(TestEvent("launchPublish externalScope Test001 $i"), externalScope)
             delay(10)
-            EventGateway.launchPublish(TestEvent("launchPublish Test001 $i"))
+            EventGateway.publish(TestEvent("launchPublish Test001 $i"))
         }
         delay(10)
 

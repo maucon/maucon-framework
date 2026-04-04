@@ -4,7 +4,8 @@ import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.di.annotation.Injectable
 import de.maucon.mauconframework.event.EventGateway
 import de.maucon.mauconframework.event.EventSubscriber
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -17,19 +18,16 @@ object Test004 {
 
     @Test
     fun test004() = runBlocking {
-        val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.start(Test004::class.java, this) }
-            val componentClasses = components.map { it.javaClass }
-            assertContains<Class<*>>(componentClasses, EventSub1::class.java)
-            assertContains<Class<*>>(componentClasses, EventSub2::class.java)
+        val components = assertDoesNotThrow { MauConFramework.start(Test004::class.java) }
+        val componentClasses = components.map { it.javaClass }
+        assertContains<Class<*>>(componentClasses, EventSub1::class.java)
+        assertContains<Class<*>>(componentClasses, EventSub2::class.java)
 
-            for (i in 0..2) {
-                delay(10)
-                EventGateway.publish(TestEvent("test$i"))
-            }
-            cancel()
+        for (i in 0..2) {
+            delay(10)
+            EventGateway.publish(TestEvent("test$i"))
         }
-        job.join()
+        delay(10)
 
         assertEquals(6, callCounter)
     }
