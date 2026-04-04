@@ -1,5 +1,6 @@
 package de.maucon.mauconframework.event
 
+import de.maucon.mauconframework.event.EventGateway.defaultScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,9 +25,20 @@ object EventGateway {
      *
      * All matching subscribers are invoked:
      * - Synchronous subscribers are executed immediately on the calling thread.
-     * - Asynchronous subscribers are launched in the provided [scope].
+     * - Asynchronous subscribers are launched in [defaultScope].
      *
-     * If no [scope] is provided, a shared default scope is used.
+     * @param event The event instance to publish.
+     */
+    fun <T : Any> publish(event: T) {
+        EventBus.publish(event, defaultScope)
+    }
+
+    /**
+     * Publishes the given [event] to the [EventBus].
+     *
+     * All matching subscribers are invoked:
+     * - Synchronous subscribers are executed immediately on the calling thread.
+     * - Asynchronous subscribers are launched in the provided [scope].
      *
      * @param event The event instance to publish.
      * @param scope The [CoroutineScope] used to launch asynchronous subscriber handlers.
@@ -34,7 +46,7 @@ object EventGateway {
      */
     fun <T : Any> publish(
         event: T,
-        scope: CoroutineScope = defaultScope,
+        scope: CoroutineScope,
     ) {
         EventBus.publish(event, scope)
     }
