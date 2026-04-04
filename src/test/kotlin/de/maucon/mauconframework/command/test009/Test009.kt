@@ -13,7 +13,7 @@ import org.junit.jupiter.api.assertThrows
 object Test009 {
     @Test
     fun test() = runBlocking {
-        val exception = assertThrows<InvalidCommandHandlerParameterSizeException> { MauConFramework.start(Test009::class.java, this) }
+        val exception = assertThrows<InvalidCommandHandlerParameterSizeException> { MauConFramework.start(Test009::class.java) }
         exception.printStackTrace()
     }
 }

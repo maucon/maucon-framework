@@ -1,10 +1,9 @@
 package de.maucon.mauconframework.command
 
 import de.maucon.mauconframework.command.cancellable.Cancellable
-import org.slf4j.LoggerFactory
+import de.maucon.mauconframework.command.exception.CommandExecutionException
 
 object CommandBus {
-    private val log = LoggerFactory.getLogger(CommandBus::class.java)
     private val handlers = mutableListOf<CommandHandlerData<out Any>>()
 
     fun <T : Any> dispatch(command: T): T {
@@ -55,9 +54,9 @@ object CommandBus {
         try {
             handler.invoke(command)
         } catch (e: Exception) {
-            log.error(
+            throw CommandExecutionException(
                 "Got exception in command handler '${handler.handlerMethodName}(${handler.commandType})' of ${handler.handlerClassType.simpleName} (${handler.handlerClassType})",
-                e.cause
+                e.cause ?: e
             )
         }
     }

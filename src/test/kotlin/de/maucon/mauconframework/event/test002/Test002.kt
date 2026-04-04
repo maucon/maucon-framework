@@ -4,7 +4,8 @@ import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.di.annotation.Injectable
 import de.maucon.mauconframework.event.EventGateway
 import de.maucon.mauconframework.event.EventSubscriber
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -19,19 +20,16 @@ object Test002 {
 
     @Test
     fun test002() = runBlocking {
-        val job = CoroutineScope(Dispatchers.Default).launch {
-            val components = assertDoesNotThrow { MauConFramework.start(Test002::class.java, this) }
-            val componentClasses = components.map { it.javaClass }
-            assertContains<Class<*>>(componentClasses, EventSub1::class.java)
-            assertContains<Class<*>>(componentClasses, EventSub2::class.java)
+        val components = assertDoesNotThrow { MauConFramework.start(Test002::class.java) }
+        val componentClasses = components.map { it.javaClass }
+        assertContains<Class<*>>(componentClasses, EventSub1::class.java)
+        assertContains<Class<*>>(componentClasses, EventSub2::class.java)
 
-            for (i in 0..2) {
-                delay(10)
-                EventGateway.publish(TestEvent("test$i"))
-            }
-            cancel()
+        for (i in 0..2) {
+            delay(10)
+            EventGateway.publish(TestEvent("test$i"))
         }
-        job.join()
+        delay(10)
 
         assertEquals(3, callCounter1)
         assertEquals(3, callCounter2)
@@ -43,7 +41,7 @@ object Test002 {
 class EventSub1 {
     @EventSubscriber
     fun on(event: TestEvent) {
-        println("EventSub1: got event: $event")
+        println("EventSub1: got event: $event ${Thread.currentThread().name}")
         Test002.callCounter1++
     }
 }
@@ -52,7 +50,7 @@ class EventSub1 {
 class EventSub2 {
     @EventSubscriber
     fun on(event: TestEvent) {
-        println("EventSub2: got event: $event")
+        println("EventSub2: got event: $event ${Thread.currentThread().name}")
         Test002.callCounter2++
     }
 }
@@ -61,7 +59,7 @@ class EventSub2 {
 class EventSub3 {
     @EventSubscriber
     fun on(event: TestEvent) {
-        println("EventSub3: got event: $event")
+        println("EventSub3: got event: $event ${Thread.currentThread().name}")
         Test002.callCounter3++
     }
 }

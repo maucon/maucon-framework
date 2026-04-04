@@ -3,12 +3,13 @@ package de.maucon.mauconframework.command.test007
 import de.maucon.mauconframework.MauConFramework
 import de.maucon.mauconframework.command.CommandGateway
 import de.maucon.mauconframework.command.CommandHandler
+import de.maucon.mauconframework.command.exception.CommandExecutionException
 import de.maucon.mauconframework.di.annotation.Injectable
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertContains
-import kotlin.test.assertEquals
 
 @DisplayName("Command handler throwing exception")
 object Test007 {
@@ -19,9 +20,7 @@ object Test007 {
         assertContains<Class<*>>(componentClasses, CommandHandler1::class.java)
         assertContains<Class<*>>(componentClasses, CommandHandler2::class.java)
 
-        val genericCmd = CommandGateway.apply(TestCommand())
-
-        assertEquals(2, genericCmd.count)
+        assertThrows<CommandExecutionException> { CommandGateway.apply(TestCommand()) }
     }
 }
 
