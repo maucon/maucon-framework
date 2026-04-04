@@ -1,4 +1,4 @@
-# MauCon-Framework [![Build](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml) [![Release](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml) [![](https://jitpack.io/v/maucon/maucon-framework.svg)](https://jitpack.io/#maucon/maucon-framework)
+# MauCon-Framework [![Build](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_other.yml) [![Release](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml/badge.svg)](https://github.com/maucon/maucon-framework/actions/workflows/build_release.yml)
 
 MauCon-Framework is a lightweight and flexible Kotlin framework that combines **dependency injection (DI)**, **command handling**, **event-driven programming**, and **repository stereotypes
 ** into a unified
@@ -26,7 +26,7 @@ and non-intrusive.
 ### Event System
 
 - `@EventSubscriber` – Register methods as event listeners automatically.
-- `EventGateway` – Publish asynchronous events with coroutine support.
+- `EventGateway` – Publish events with coroutine support.
 
 ### Stereotypes
 
@@ -48,12 +48,16 @@ It also:
 
 ### Gradle
 
-Set up the JitPack repository:
+Set up the GitHub Maven repository with your credentials:
 
 ```kotlin
 repositories {
-    maven("https://jitpack.io") {
-        name = "jitpack-repo"
+    maven {
+        url = uri("https://maven.pkg.github.com/maucon/maucon-framework")
+        credentials {
+            username = "<GITHUB_USERNAME>"
+            password = "<GITHUB_TOKEN>"
+        }
     }
 }
 ```
@@ -62,7 +66,7 @@ Add the following dependency:
 
 ```kotlin
 dependencies {
-    implementation("com.github.maucon:maucon-framework:v1.9.0")
+    implementation("com.github.maucon:maucon-framework:v2.0.0")
 }
 ```
 
@@ -123,7 +127,7 @@ class MyEventListener {
 data class MyEvent(val message: String)
 
 // Publishing
-EventGateway.launchPublish(MyEvent("Hello Events"))
+EventGateway.publish(MyEvent("Hello Events"))
 ```
 
 ### Repository Stereotypes
