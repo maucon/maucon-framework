@@ -56,7 +56,7 @@ object CommandBus {
         } catch (e: Exception) {
             throw CommandExecutionException(
                 "Got exception in command handler '${handler.handlerMethodName}(${handler.commandType})' of ${handler.handlerClassType.simpleName} (${handler.handlerClassType})",
-                e.cause
+                e.cause ?: e
             )
         }
     }

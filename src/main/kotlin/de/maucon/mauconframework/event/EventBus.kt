@@ -50,7 +50,7 @@ object EventBus {
             with(handler) {
                 log.error(
                     "Got exception in event subscriber '${subscriberMethodName}(${eventType})' of ${subscriberClassType.simpleName} (${subscriberClassType})",
-                    e.cause
+                    e.cause ?: e
                 )
             }
         }
