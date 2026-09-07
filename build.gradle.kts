@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation(kotlin("reflect", "2.4.0"))
     implementation("org.reflections:reflections:0.10.2")
-    implementation("org.slf4j:slf4j-api:2.0.18")
+    implementation("org.slf4j:slf4j-api:2.0.19")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 
     testImplementation(kotlin("test", "2.4.0"))
