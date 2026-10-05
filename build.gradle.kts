@@ -17,7 +17,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
 
     testImplementation(kotlin("test", "2.4.0"))
-    testImplementation("ch.qos.logback:logback-classic:1.6.3")
+    testImplementation("ch.qos.logback:logback-classic:1.6.5")
 }
 
 tasks.test {
